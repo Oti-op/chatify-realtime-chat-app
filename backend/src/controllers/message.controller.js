@@ -34,7 +34,7 @@ export const getMessagesByUserId = async (req, res) => {
 
 export const sendMessage = async (req, res) => {
     try {
-        const { text, message } = req.body;
+        const { text, image } = req.body;
         const { id: receiverId } = req.params;
         const senderId = req.user._id;
         let imageUrl;
@@ -57,4 +57,8 @@ export const sendMessage = async (req, res) => {
         console.error("Error sending message:", error);
         res.status(500).json({ message: "Internal server error" });
     }
+}
+
+export const getChatPartners = async (req, res) => {
+
 }
