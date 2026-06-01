@@ -63,6 +63,10 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
     const {email, password} = req.body
 
+    if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+    }
+
     try {
         const user = await User.findOne({email})
         if(!user) return res.status(400).json({message: "Invalid Credentials"})
@@ -86,7 +90,12 @@ export const login = async (req, res) => {
 };
 
 export const logout = (_, res) => {
-    res.cookie("token", "", {maxAge: 0})
+    res.cookie("token", "", {
+        httpOnly: true,
+        secure: ENV.NODE_ENV !== "development",
+        sameSite: "strict",
+        maxAge: 0
+    });
     res.status(200).json({ message: "Logged out successfully" });
 };
 
@@ -99,7 +108,7 @@ export const updateProfile = async (req, res) => {
 
             const uploadResponse = await cloudinary.uploader.upload(profilePic)
 
-            const updatedUser = await User.findOneAndUpdate(userId, { profilePic: uploadResponse.secure_url }, { new: true });
+            const updatedUser = await User.findByIdAndUpdate(userId, { profilePic: uploadResponse.secure_url }, { new: true });
 
             res.status(200).json(updatedUser)
     } catch (error) {
